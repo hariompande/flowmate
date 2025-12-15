@@ -1,33 +1,80 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve"
+    // ═══════════════════════════════════════════════════════════════════════
+    // STRICT TYPE CHECKING — Catch bugs at compile time, not runtime
+    // ═══════════════════════════════════════════════════════════════════════
+    "strict": true,                           // Enables all strict type-checking options
+    "noImplicitOverride": true,               // Require 'override' keyword for inherited methods
+    "noPropertyAccessFromIndexSignature": true, // Force bracket notation for dynamic props
+    "noImplicitReturns": true,                // All code paths must return a value
+    "noFallthroughCasesInSwitch": true,       // Prevent accidental switch fallthrough
+    "noUncheckedIndexedAccess": true,         // Array[i] and obj[key] may be undefined
+    "noImplicitAny": true,                    // Error on inferred 'any' type
+    "strictNullChecks": true,                 // null and undefined are distinct types
+    "strictFunctionTypes": true,              // Stricter function parameter checking
+    "strictBindCallApply": true,              // Check bind, call, apply arguments
+    "strictPropertyInitialization": true,     // Class properties must be initialized
+    "useUnknownInCatchVariables": true,       // catch(e) → e is unknown, not any
+    "exactOptionalPropertyTypes": true,       // Distinguish between undefined and missing
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CODE QUALITY — Prevent common mistakes
+    // ═══════════════════════════════════════════════════════════════════════
+    "noUnusedLocals": true,                   // Error on unused local variables
+    "noUnusedParameters": true,               // Error on unused function parameters
+    "allowUnusedLabels": false,               // Error on unused labels
+    "allowUnreachableCode": false,            // Error on unreachable code
+    "forceConsistentCasingInFileNames": true, // Prevent case-sensitivity bugs across OS
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // MODULE & BUILD SETTINGS
+    // ═══════════════════════════════════════════════════════════════════════
+    "target": "ES2022",                       // Modern JS features (top-level await, etc.)
+    "module": "preserve",                     // Let bundler handle module format
+    "moduleResolution": "bundler",            // Modern resolution for Vite/esbuild
+    "resolveJsonModule": true,                // Allow importing .json files
+    "esModuleInterop": true,                  // Better CommonJS/ESM interop
+    "isolatedModules": true,                  // Required for esbuild/swc transpilation
+    "verbatimModuleSyntax": true,             // Explicit type-only imports
+    "skipLibCheck": true,                     // Skip .d.ts checking (faster builds)
+    "declaration": false,                     // No .d.ts files for app code
+    "importHelpers": true,                    // Use tslib for smaller bundles
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // DECORATORS — Required for Angular
+    // ═══════════════════════════════════════════════════════════════════════
+    "experimentalDecorators": true,           // Enable @Component, @Injectable, etc.
+    "emitDecoratorMetadata": false,           // Not needed with Angular 21+
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PATH ALIASES — Cleaner imports
+    // ═══════════════════════════════════════════════════════════════════════
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@env/*": ["src/environments/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@core/*": ["src/app/core/*"]
+    }
   },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // ANGULAR COMPILER OPTIONS — Strict template checking
+  // ═══════════════════════════════════════════════════════════════════════
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "enableI18nLegacyMessageIdFormat": false, // Use modern i18n format
+    "strictInjectionParameters": true,        // Strict DI parameter checking
+    "strictInputAccessModifiers": true,       // Respect input() access modifiers
+    "strictTemplates": true,                  // Full template type checking
+    "extendedDiagnostics": {
+      "defaultCategory": "error"              // Treat Angular diagnostics as errors
+    }
   },
+
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.spec.json" }
   ]
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit, signal} from '@angular/core';
+import { ChangeDetectionStrategy, Component, type OnInit, signal } from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -8,7 +8,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';import { RouterO
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,
+  imports: [
+    RouterOutlet,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -16,18 +17,19 @@ import {MatFormFieldModule} from '@angular/material/form-field';import { RouterO
     ReactiveFormsModule,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App implements OnInit {
+export class AppComponent implements OnInit {
   protected readonly title = signal('flowmate');
   myControl = new FormControl('');
   options: string[] = ['One', 'Two', 'Three'];
   filteredOptions: Observable<string[]> = of([]);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value || '')),
+      map(value => this._filter(value ?? '')),
     );
   }
 
