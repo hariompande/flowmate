@@ -24,7 +24,7 @@ module.exports = defineConfig([
               group: ['@angular/common'],
               importNames: ['CommonModule'],
               message:
-                "Use the componen or directve directly e.g. `import {NgFor} from '@angular/common`'.",
+                "Use the component or directive directly e.g. `import {NgFor} from '@angular/common`'.",
             },
           ],
         },

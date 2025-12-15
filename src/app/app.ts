@@ -2,7 +2,6 @@ import {Component, OnInit, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable, of} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
-import {AsyncPipe} from '@angular/common';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';import { RouterOutlet } from '@angular/router';
@@ -15,7 +14,6 @@ import {MatFormFieldModule} from '@angular/material/form-field';import { RouterO
     MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
-    AsyncPipe
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
