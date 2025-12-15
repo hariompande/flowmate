@@ -6,9 +6,19 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test:watch": "ng test --watch",
+    "test:coverage": "ng test --coverage",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
+    "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
+    "validate": "run-p lint test",
+    "validate:fix": "run-s lint:fix format",
+    "ci": "run-s lint test build:prod",
+    "prepare": "husky"
   },
   "private": true,
   "packageManager": "npm@11.6.2",
@@ -22,10 +32,27 @@
     "@angular/material": "^21.0.0",
     "@angular/platform-browser": "^21.0.0",
     "@angular/router": "^21.0.0",
+    "@ngrx/signals": "^21.0.0-beta.0",
     "prettier": "^3.6.2",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.17",
     "tslib": "^2.3.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.html": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss}": [
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@angular/build": "^21.0.0",
@@ -35,7 +62,10 @@
     "@vitest/browser-playwright": "^4.0.15",
     "angular-eslint": "21.0.0",
     "eslint": "^9.39.1",
+    "husky": "9.1.7",
     "jsdom": "^27.3.0",
+    "lint-staged": "16.2.7",
+    "npm-run-all2": "8.0.4",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
