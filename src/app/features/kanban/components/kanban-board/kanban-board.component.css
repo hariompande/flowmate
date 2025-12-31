@@ -9,7 +9,7 @@
 }
 
 [data-testid='kanban-board']::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d1d7df;
   border-radius: 4px;
 }
 
