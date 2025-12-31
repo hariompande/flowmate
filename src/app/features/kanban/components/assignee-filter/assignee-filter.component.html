@@ -1,0 +1,112 @@
+<div class="flex items-center">
+  <!-- Loading skeleton -->
+  @if (isLoading()) {
+    @for (i of [1, 2, 3]; track i) {
+      <div class="w-8 h-8 rounded-full bg-neutral-200 animate-pulse border-2 border-white" [class.-ml-2]="i > 1"></div>
+    }
+  }
+
+  <!-- Visible assignees -->
+  @if (!isLoading()) {
+    <!-- Unassigned button -->
+    <button
+      type="button"
+      [attr.data-testid]="testIdPrefix() + '-toggle-unassigned'"
+      class="relative w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 border-2 cursor-pointer focus:outline-none"
+      [class.border-[4px]]="isUnassignedSelected()"
+      [class.border-[inset_0_0_0_2px_#1D68CB]]="isUnassignedSelected()"
+      [class.shadow-[0_0_0_1px_#1D68CB]]="isUnassignedSelected()"
+      [class.border-white]="!isUnassignedSelected()"
+      [class.hover:border-blue-300]="noFilterActive() && !isUnassignedSelected()"
+      [style.backgroundColor]="'#94a3b8'"
+      [style.z-index]="visibleAssignees().length + 1"
+      title="Unassigned"
+      (click)="toggleUnassigned()"
+    >
+      <mat-icon class="text-white text-sm">person</mat-icon>
+    </button>
+
+    @for (assignee of visibleAssignees(); track assignee.id; let index = $index) {
+      <button
+        type="button"
+        [attr.data-testid]="testIdPrefix() + '-toggle-' + assignee.id"
+        class="relative w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 border-2 cursor-pointer focus:outline-none -ml-2"
+        [class.border-[4px]]="isSelected(assignee.id)"
+        [class.border-[inset_0_0_0_2px_#1D68CB]]="isSelected(assignee.id)"
+        [class.shadow-[0_0_0_1px_#1D68CB]]="isSelected(assignee.id)"
+        [class.border-white]="!isSelected(assignee.id)"
+        [class.hover:border-blue-300]="noFilterActive() && !isSelected(assignee.id)"
+        [style.backgroundColor]="assignee.color"
+        [style.z-index]="visibleAssignees().length - index"
+        [title]="assignee.name"
+        (click)="toggleAssignee(assignee.id)"
+      >
+        @if (assignee.avatar || assignee.profilePicUrl) {
+          <img
+            class="w-6 h-6 rounded-full object-cover"
+            width="24"
+            height="24"
+            [ngSrc]="(assignee.avatar || assignee.profilePicUrl)!"
+            [alt]="assignee.name"
+          />
+        } @else {
+          <span>{{ assignee.initials }}</span>
+        }
+      </button>
+    }
+
+    <!-- Overflow indicator -->
+    @if (overflowCount() > 0) {
+      <button
+        type="button"
+        [attr.data-testid]="testIdPrefix() + '-overflow'"
+        class="-ml-2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium bg-neutral-100 text-neutral-600 border-2 border-white hover:bg-neutral-200 transition-colors cursor-pointer"
+        [class.border-[4px]]="hasOverflowSelected()"
+        [class.border-[inset_0_0_0_2px_#1D68CB]]="hasOverflowSelected()"
+        [class.shadow-[0_0_0_1px_#1D68CB]]="hasOverflowSelected()"
+        [style.z-index]="0"
+        [matMenuTriggerFor]="overflowMenu"
+        (click)="toggleMenu()"
+      >
+        +{{ overflowCount() }}
+      </button>
+    }
+  }
+</div>
+
+<!-- Overflow Menu -->
+<mat-menu #overflowMenu="matMenu" [attr.data-testid]="testIdPrefix() + '-overflow-menu'">
+  <div class="flex flex-col py-2 min-w-[200px]">
+    @for (assignee of overflowAssignees(); track assignee.id) {
+      <label
+        [attr.data-testid]="testIdPrefix() + '-menu-item-' + assignee.id"
+        class="flex items-center gap-3 px-3 py-2 hover:bg-neutral-50 transition-colors cursor-pointer"
+        (click)="toggleAssignee(assignee.id)"
+      >
+        <mat-checkbox
+          [checked]="isSelected(assignee.id)"
+          [attr.data-testid]="testIdPrefix() + '-menu-checkbox-' + assignee.id"
+          class="flex-shrink-0 scale-75"
+          (click)="$event.stopPropagation(); toggleAssignee(assignee.id)"
+        />
+        <div
+          class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
+          [style.backgroundColor]="assignee.color"
+        >
+          @if (assignee.avatar || assignee.profilePicUrl) {
+            <img
+              class="w-full h-full rounded-full object-cover"
+              width="28"
+              height="28"
+              [ngSrc]="(assignee.avatar || assignee.profilePicUrl)!"
+              [alt]="assignee.name"
+            />
+          } @else {
+            <span>{{ assignee.initials }}</span>
+          }
+        </div>
+        <span class="text-sm text-neutral-900">{{ assignee.name }}</span>
+      </label>
+    }
+  </div>
+</mat-menu>

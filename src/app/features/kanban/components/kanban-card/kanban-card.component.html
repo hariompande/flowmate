@@ -1,0 +1,91 @@
+<div
+  class="bg-white rounded-lg border border-neutral-100 p-3 cursor-pointer hover:shadow-md hover:border-neutral-300 group transition-[box-shadow,border-color] duration-150 w-75"
+  tabindex="0"
+  role="button"
+  [attr.data-testid]="cardTestId()"
+  [attr.data-card-id]="cardDataId()"
+  [draggable]="draggable()"
+  (click)="onCardClick()"
+  (keydown)="onKeydown($event)"
+  (dragstart)="onDragStart($event)"
+  (dragend)="onDragEnd($event)"
+>
+  <!-- Title with Menu Button -->
+  <div class="flex items-center justify-between gap-2">
+    <h4 class="text-base text-neutral-strong-950 line-clamp-1 flex-1 font-normal!" [attr.data-testid]="titleTestId()">
+      {{ card().title }}
+    </h4>
+    @if (showMenu()) {
+      <button
+        type="button"
+        class="opacity-100 transition-opacity p-1 rounded hover:bg-neutral-100 shrink-0"
+        [attr.data-testid]="menuTestId()"
+        [matMenuTriggerFor]="menu"
+        (click)="$event.stopPropagation()"
+      >
+        <mat-icon class="text-neutral-600 text-xl">more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        @for (item of menuItems(); track 'separator' in item ? 'separator' : item.label) {
+          @if ('separator' in item) {
+            <mat-divider />
+          } @else {
+            <button
+              type="button"
+              mat-menu-item
+              [attr.data-testid]="getMenuItemTestId(item.label)"
+              [class]="item.class || ''"
+              (click)="item.action()"
+            >
+              <mat-icon>{{ item.icon }}</mat-icon>
+              <span>{{ item.label }}</span>
+            </button>
+          }
+        }
+      </mat-menu>
+    }
+  </div>
+
+  <!-- Description -->
+  @if (card().description) {
+    <p class="text-xs text-neutral-600 mb-3 line-clamp-2 font-normal!" [attr.data-testid]="descriptionTestId()">
+      {{ card().description }}
+    </p>
+  }
+
+  <!-- Tags -->
+  @if (hasTags()) {
+    <div class="flex flex-wrap gap-1.5 mt-4">
+      @for (tag of card().tags!; track $index) {
+        <span
+          [attr.data-testid]="getTagTestId($index)"
+          [class]="`text-xs px-2 py-0.5 rounded border ${getTagColorClass(tag.color)}`"
+        >
+          {{ tag.label }}
+        </span>
+      }
+    </div>
+  }
+
+  <!-- Custom Fields -->
+  @if (hasFields()) {
+    <div class="space-y-2 mb-3">
+      @for (field of card().fields!; track field.key) {
+        <div class="flex items-center gap-2 text-xs text-neutral-600">
+          @if (field.icon) {
+            <mat-icon class="text-neutral-400 text-base">{{ field.icon }}</mat-icon>
+          }
+          @if (field.label) {
+            <span class="font-medium">{{ field.label }}:</span>
+          }
+          <span>{{ field.value }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Footer: Ticket ID and Assignee -->
+  @if (showFooter()) {
+    <app-kanban-card-footer [card]="card()" (assigneeClick)="assigneeClick.emit($event)" />
+  }
+</div>

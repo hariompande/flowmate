@@ -1,0 +1,211 @@
+<div class="task-details-dialog">
+  <div class="flex items-center justify-between w-full mb-4 pb-4 border-b border-neutral-200">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full border border-neutral-200 flex items-center justify-center">
+        <mat-icon class="text-neutral-700 text-xl">check_box</mat-icon>
+      </div>
+      <h3 class="text-lg text-neutral-strong-950 font-medium">Task details</h3>
+    </div>
+    <button type="button" class="text-neutral-400 hover:text-neutral-600 transition-colors" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  @if (taskComputed(); as currentTask) {
+    <div class="flex items-start justify-between gap-4">
+      <!-- Left Content -->
+      <div class="flex-1 max-w-[1000px] overflow-y-auto overflow-x-hidden pr-2 max-h-[calc(100vh-250px)]">
+        <!-- Task ID -->
+        <div class="mb-4">
+          <div class="text-xs text-neutral-500"># Task</div>
+          <div class="text-lg font-semibold text-neutral-strong-950">
+            {{ taskId() }}
+          </div>
+        </div>
+
+        <!-- Task Name -->
+        <div class="mb-4 group">
+          <div class="flex items-center gap-2">
+            <div class="text-xs text-neutral-500">Task title</div>
+            <span class="text-red-500 text-xs">*</span>
+          </div>
+
+          @if (isEditingName()) {
+            <input
+              type="text"
+              class="w-full mt-1 px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-400"
+              [value]="editedName()"
+              (input)="editedName.set($any($event.target).value)"
+              (blur)="finishEditName()"
+              (keyup.enter)="finishEditName()"
+              (keyup.escape)="isEditingName.set(false)"
+            />
+          } @else {
+            <div
+              class="flex items-center gap-2 cursor-pointer rounded-lg transition-colors pt-2 w-full"
+              [class.bg-neutral-50]="!readOnlyComputed()"
+              [class.py-4]="!readOnlyComputed()"
+              [class.px-1]="!readOnlyComputed()"
+              (click)="startEditName()"
+            >
+              <span
+                class="text-base font-semibold text-neutral-strong-950 break-words overflow-wrap-anywhere flex-1 min-w-0"
+              >
+                {{ editedName() || '--' }}
+              </span>
+              @if (!readOnlyComputed()) {
+                <mat-icon class="text-neutral-400 text-sm flex-shrink-0">edit</mat-icon>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4 group">
+          <div class="text-xs text-neutral-500">Description</div>
+
+          @if (isEditingDescription()) {
+            <textarea
+              class="w-full mt-1 px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-400 min-h-[80px] max-h-[300px] overflow-y-auto resize-none"
+              [value]="editedDescription()"
+              (input)="editedDescription.set($any($event.target).value)"
+              (blur)="finishEditDescription()"
+              (keyup.escape)="isEditingDescription.set(false)"
+              placeholder="Add description..."
+            ></textarea>
+          } @else {
+            <div
+              class="flex items-start gap-2 cursor-pointer rounded-lg transition-colors min-h-[2rem] pt-2 w-full"
+              [class.bg-neutral-50]="!readOnlyComputed()"
+              [class.py-4]="!readOnlyComputed()"
+              [class.px-1]="!readOnlyComputed()"
+              (click)="startEditDescription()"
+            >
+              <span
+                class="text-sm text-neutral-700 flex-1 break-words overflow-wrap-anywhere whitespace-pre-wrap min-w-0"
+              >
+                {{ editedDescription() || 'Add description...' }}
+              </span>
+              @if (!readOnlyComputed()) {
+                <mat-icon class="text-neutral-400 text-sm flex-shrink-0">edit</mat-icon>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Tags -->
+        @if (currentTask.tags && currentTask.tags.length > 0) {
+          <div class="mb-4">
+            <div class="text-xs text-neutral-500 mb-2">Tags</div>
+            <div class="flex flex-wrap gap-1.5">
+              @for (tag of currentTask.tags; track tag.label) {
+                <span
+                  class="text-xs px-2 py-0.5 rounded border"
+                  [class.bg-blue-50]="tag.color === 'blue'"
+                  [class.text-blue-700]="tag.color === 'blue'"
+                  [class.border-blue-200]="tag.color === 'blue'"
+                  [class.bg-green-50]="tag.color === 'green'"
+                  [class.text-green-700]="tag.color === 'green'"
+                  [class.border-green-200]="tag.color === 'green'"
+                  [class.bg-purple-50]="tag.color === 'purple'"
+                  [class.text-purple-700]="tag.color === 'purple'"
+                  [class.border-purple-200]="tag.color === 'purple'"
+                  [class.bg-orange-50]="tag.color === 'orange'"
+                  [class.text-orange-700]="tag.color === 'orange'"
+                  [class.border-orange-200]="tag.color === 'orange'"
+                  [class.bg-red-50]="tag.color === 'red'"
+                  [class.text-red-700]="tag.color === 'red'"
+                  [class.border-red-200]="tag.color === 'red'"
+                  [class.bg-neutral-50]="tag.color === 'neutral'"
+                  [class.text-neutral-700]="tag.color === 'neutral'"
+                  [class.border-neutral-200]="tag.color === 'neutral'"
+                >
+                  {{ tag.label }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Tabs: Notes / Activity -->
+        <div class="pt-4 border-t border-neutral-100 mt-4">
+          <mat-tab-group [(selectedIndex)]="activeTabIndex">
+            <mat-tab label="Notes">
+              <div class="pt-4 space-y-4">
+                <div class="text-sm text-neutral-400 text-center py-8">No notes yet</div>
+              </div>
+            </mat-tab>
+            <mat-tab label="Activity history">
+              <div class="pt-4 space-y-3">
+                <div class="text-sm text-neutral-400 text-center py-8">No activity history</div>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+
+      <!-- Right Side Card -->
+      <div class="bg-neutral-50 rounded-xl p-4 min-w-[180px] ml-4 flex flex-col gap-2 min-h-[200px]">
+        <!-- Assigned To -->
+        <div class="mb-3 min-h-[3.5rem]">
+          <div class="text-xs text-neutral-500 mb-2">Assigned to</div>
+          @if (!readOnlyComputed()) {
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-select [value]="selectedAssigneeId()" (selectionChange)="onAssigneeChange($event.value)">
+                @for (option of assigneeOptions(); track option.value) {
+                  <mat-option [value]="option.value">
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold overflow-hidden"
+                        [style.backgroundColor]="option.color"
+                        [style.color]="getTextColor(option.color)"
+                      >
+                        @if (option.avatar) {
+                          <img
+                            class="w-full h-full object-cover"
+                            width="28"
+                            height="28"
+                            [ngSrc]="option.avatar"
+                            [alt]="option.label"
+                          />
+                        } @else {
+                          <span>{{ option.initials || 'U' }}</span>
+                        }
+                      </div>
+                      <span class="text-xs">{{ option.label }}</span>
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          } @else {
+            @if (selectedAssignee()) {
+              <div class="flex items-center gap-2">
+                <app-assignee-avatar [assignee]="selectedAssignee()" />
+                <span class="text-sm text-neutral-700">{{ selectedAssignee()!.name }}</span>
+              </div>
+            } @else {
+              <div class="text-sm text-neutral-400">--</div>
+            }
+          }
+        </div>
+
+        <!-- Due Date -->
+        <div class="min-h-[3.5rem]">
+          <div class="text-xs text-neutral-500 mb-2">Due date</div>
+          <div class="text-sm font-medium text-neutral-strong-950">
+            {{ currentTask.dueDate || '--' }}
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="mb-3 min-h-[3.5rem]">
+          <div class="text-xs text-neutral-500 mb-2">Priority</div>
+          <div class="text-sm font-medium text-neutral-strong-950 capitalize">
+            {{ currentTask.priority || '--' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,212 +1,309 @@
-# Flowmate
+# Flowmate - Kanban Board Application
 
-A modern Angular 21 application built with signals, standalone components, and best-in-class tooling.
+A modern, feature-rich Kanban board application built with Angular 21, featuring drag-and-drop task management, assignee filtering, and task details dialog.
 
-## Tech Stack
+## 🚀 Features
 
-| Category         | Technology             |
-| ---------------- | ---------------------- |
-| Framework        | Angular 21             |
-| UI Components    | Angular Material 21    |
-| Styling          | Tailwind CSS 4         |
-| State Management | NgRx SignalStore       |
-| Testing          | Vitest + jsdom         |
-| Linting          | ESLint 9 (flat config) |
-| Formatting       | Prettier               |
-| Git Hooks        | Husky + lint-staged    |
+### Core Functionality
 
-## Prerequisites
+- **Kanban Board**: Visual task management with customizable columns
+- **Drag & Drop**: Intuitive drag-and-drop for tasks and columns
+- **Task Management**: Create, edit, and delete tasks with rich metadata
+- **Assignee Filtering**: Filter tasks by assignee with visual avatar indicators
+- **Task Details Dialog**: Comprehensive task details with inline editing
+- **Static Data**: Pre-configured with sample data for demonstration
 
-- **Node.js** 20.x or higher
-- **npm** 10.x or higher
+### Task Features
 
-## Getting Started
+- Task titles and descriptions
+- Priority levels (High, Medium, Low)
+- Tags with color coding
+- Due dates
+- Assignee assignment with avatars
+- Custom fields support
+- Ticket IDs
+
+### UI/UX Features
+
+- Modern, responsive design with Tailwind CSS
+- Angular Material components for consistent UI
+- Smooth animations and transitions
+- Inline editing for task properties
+- Visual feedback for drag operations
+- Accessible components with proper ARIA labels
+
+## 🛠️ Tech Stack
+
+- **Framework**: Angular 21
+- **Language**: TypeScript 5.9
+- **Styling**: Tailwind CSS 4.x
+- **UI Components**: Angular Material 21
+- **State Management**: Angular Signals
+- **Build Tool**: Angular Build (esbuild)
+- **Linting**: ESLint with Angular ESLint
+- **Testing**: Vitest with Playwright
+
+## 📋 Prerequisites
+
+- Node.js 18+ and npm 11.6.2+
+- Angular CLI 21+
+
+## 🏃 Getting Started
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-# Clone the repository
 git clone <repository-url>
 cd flowmate
+```
 
-# Install dependencies
+2. Install dependencies:
+
+```bash
 npm install
+```
 
-# Start development server
+### Development Server
+
+Run the development server:
+
+```bash
 npm start
 ```
 
-Open [http://localhost:4200](http://localhost:4200) in your browser.
-
-## Available Scripts
-
-### Development
-
-| Command         | Description                          |
-| --------------- | ------------------------------------ |
-| `npm start`     | Start dev server at `localhost:4200` |
-| `npm run watch` | Build in watch mode                  |
+Navigate to `http://localhost:4200/` to view the application.
 
 ### Build
 
-| Command              | Description                  |
-| -------------------- | ---------------------------- |
-| `npm run build`      | Development build            |
-| `npm run build:prod` | Production build (optimized) |
+Build for production:
+
+```bash
+npm run build:prod
+```
+
+The build artifacts will be stored in the `dist/` directory.
 
 ### Testing
 
-| Command                 | Description                    |
-| ----------------------- | ------------------------------ |
-| `npm test`              | Run tests once                 |
-| `npm run test:watch`    | Run tests in watch mode        |
-| `npm run test:coverage` | Run tests with coverage report |
+Run unit tests:
 
-### Code Quality
-
-| Command                | Description             |
-| ---------------------- | ----------------------- |
-| `npm run lint`         | Check for lint errors   |
-| `npm run lint:fix`     | Auto-fix lint errors    |
-| `npm run format`       | Format all source files |
-| `npm run format:check` | Check formatting (CI)   |
-
-### Composite Scripts
-
-| Command                | Description                           |
-| ---------------------- | ------------------------------------- |
-| `npm run validate`     | Run lint + test in parallel           |
-| `npm run validate:fix` | Fix lint errors + format              |
-| `npm run ci`           | Full CI pipeline: lint → test → build |
-
-## Project Structure
-
-```
-flowmate/
-├── src/
-│   ├── app/
-│   │   ├── core/           # Singleton services, guards, interceptors
-│   │   ├── shared/         # Reusable components, pipes, directives
-│   │   ├── features/       # Feature modules (lazy-loaded)
-│   │   ├── app.ts          # Root component
-│   │   ├── app.config.ts   # Application configuration
-│   │   └── app.routes.ts   # Root routes
-│   ├── environments/       # Environment configurations
-│   ├── styles.css          # Global styles
-│   └── main.ts             # Application entry point
-├── .husky/                 # Git hooks
-├── eslint.config.js        # ESLint configuration (flat config)
-├── tsconfig.json           # TypeScript configuration
-└── angular.json            # Angular CLI configuration
+```bash
+npm test
 ```
 
-## Path Aliases
+Run tests with coverage:
 
-Clean imports using TypeScript path aliases:
+```bash
+npm run test:coverage
+```
+
+### Linting
+
+Run ESLint:
+
+```bash
+npm run lint
+```
+
+Fix linting issues automatically:
+
+```bash
+npm run lint:fix
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── features/
+│   │   └── kanban/
+│   │       ├── components/
+│   │       │   ├── assignee-filter/      # Assignee filtering component
+│   │       │   ├── kanban-board/        # Main board container
+│   │       │   ├── kanban-card/         # Individual task card
+│   │       │   │   ├── assignee-avatar/ # Avatar component
+│   │       │   │   └── kanban-card-footer/ # Card footer component
+│   │       │   ├── kanban-column/        # Column component
+│   │       │   └── task-details/        # Task details dialog
+│   │       ├── models/
+│   │       │   └── kanban.types.ts      # TypeScript interfaces
+│   │       ├── pages/
+│   │       │   └── kanban-page/         # Main page component
+│   │       ├── services/
+│   │       │   └── kanban-data.service.ts # Data service
+│   │       └── utils/
+│   │           └── kanban.utils.ts       # Utility functions
+│   ├── app.config.ts                    # App configuration
+│   └── app.routes.ts                    # Routing configuration
+```
+
+## 🎯 Key Components
+
+### KanbanBoardComponent
+
+Main container component that orchestrates columns and handles drag-and-drop operations.
+
+**Features:**
+
+- Column management
+- Task drag-and-drop between columns
+- Column reordering
+- Task click/edit handlers
+
+### KanbanColumnComponent
+
+Represents a single column in the Kanban board.
+
+**Features:**
+
+- Task rendering
+- Drop zone handling
+- Column-specific actions
+
+### KanbanCardComponent
+
+Individual task card component.
+
+**Features:**
+
+- Task information display
+- Drag handle
+- Menu actions (edit, delete)
+- Assignee avatar display
+- Tags and fields rendering
+
+### AssigneeFilterComponent
+
+Filter component for filtering tasks by assignee.
+
+**Features:**
+
+- Visual assignee avatars
+- Multi-select filtering
+- Overflow menu for many assignees
+- Unassigned filter option
+
+### TaskDetailsComponent
+
+Modal dialog for viewing and editing task details.
+
+**Features:**
+
+- Inline editing for title and description
+- Assignee selection
+- Task metadata display
+- Notes and activity history tabs (placeholder)
+
+## 🔧 Configuration
+
+### Angular Configuration
+
+- **Change Detection**: OnPush strategy for optimal performance
+- **Standalone Components**: All components are standalone
+- **Signals**: Modern reactive state management
+
+### Styling
+
+- Tailwind CSS for utility-first styling
+- Angular Material for component library
+- Custom theme configuration in `src/custom-theme.scss`
+
+### Data Service
+
+The `KanbanDataService` manages all Kanban data:
+
+- Static data initialization
+- Column and task CRUD operations
+- Assignee filtering logic
+- Signal-based reactivity
+
+## 📝 Usage Examples
+
+### Using the Kanban Board
 
 ```typescript
-// Instead of
-import { UserService } from '../../../core/services/user.service';
+import { KanbanBoardComponent } from './features/kanban/components/kanban-board/kanban-board.component';
 
-// Use
-import { UserService } from '@core/services/user.service';
-```
-
-| Alias       | Path                 |
-| ----------- | -------------------- |
-| `@app/*`    | `src/app/*`          |
-| `@core/*`   | `src/app/core/*`     |
-| `@shared/*` | `src/app/shared/*`   |
-| `@env/*`    | `src/environments/*` |
-
-## Code Quality
-
-### Pre-commit Hooks
-
-Husky runs lint-staged on every commit:
-
-- **TypeScript files**: ESLint fix + Prettier
-- **HTML files**: ESLint fix + Prettier
-- **CSS/SCSS files**: Prettier
-- **JSON/Markdown files**: Prettier
-
-### ESLint Configuration
-
-Strict Angular + TypeScript rules:
-
-- Type-aware linting enabled
-- OnPush change detection enforced
-- Strict template checking
-- Accessibility rules (a11y)
-
-### TypeScript Configuration
-
-Maximum type safety:
-
-- `strict: true` with all sub-options
-- `noUncheckedIndexedAccess` — array access may be undefined
-- `exactOptionalPropertyTypes` — stricter optional types
-- `verbatimModuleSyntax` — explicit type imports
-
-## Angular Conventions
-
-### Components
-
-```typescript
 @Component({
-  selector: 'app-example',
-  templateUrl: './example.html',
-  styleUrl: './example.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-my-component',
+  imports: [KanbanBoardComponent],
+  template: `
+    <app-kanban-board
+      [readOnly]="false"
+      [showAddTask]="true"
+      [showTaskMenu]="true"
+      [canDragTasks]="true"
+      [canDragColumns]="true"
+    />
+  `,
 })
-export class ExampleComponent {
-  // Use signals for state
-  private readonly count = signal(0);
+export class MyComponent {}
+```
 
-  // Use computed for derived state
-  protected readonly doubled = computed(() => this.count() * 2);
+### Filtering by Assignee
 
-  // Use input() and output() functions
-  readonly data = input.required<Data>();
-  readonly selected = output<Item>();
+The assignee filter automatically filters tasks displayed in the board:
+
+```typescript
+onAssigneeFilterChange(selectedIds: (string | null)[]): void {
+  this.kanbanDataService.setAssigneeFilter(selectedIds);
 }
 ```
 
-### Services
+## 🧪 Development Guidelines
 
-```typescript
-@Injectable({ providedIn: 'root' })
-export class ExampleService {
-  private readonly http = inject(HttpClient);
+### Code Style
 
-  getData(): Observable<Data[]> {
-    return this.http.get<Data[]>('/api/data');
-  }
-}
-```
+- Follow Angular style guide
+- Use standalone components
+- Prefer signals over observables for state
+- Use OnPush change detection
+- TypeScript strict mode enabled
 
-### State Management (NgRx SignalStore)
+### Component Architecture
 
-```typescript
-export const CounterStore = signalStore(
-  withState({ count: 0 }),
-  withComputed(({ count }) => ({
-    doubled: computed(() => count() * 2),
-  })),
-  withMethods((store) => ({
-    increment(): void {
-      patchState(store, { count: store.count() + 1 });
-    },
-  }))
-);
-```
+- **Functional Core / Imperative Shell**: Separate business logic from I/O
+- **Immutability**: Don't mutate passed parameters
+- **Error Handling**: Explicit error handling, no silent failures
+- **Type Safety**: Explicit types, avoid `any`
 
-## Contributing
+### Best Practices
 
-1. Create a feature branch from `main`
-2. Make your changes
-3. Run `npm run validate` to ensure quality
-4. Commit (pre-commit hooks will run automatically)
-5. Open a pull request
+- Keep components small and focused
+- Use computed signals for derived state
+- Extract reusable logic into services
+- Use proper TypeScript types
+- Follow accessibility guidelines
 
-## License
+## 🐛 Troubleshooting
 
-Private — All rights reserved.
+### Build Issues
+
+If you encounter build errors:
+
+1. Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
+2. Clear Angular cache: `rm -rf .angular`
+3. Rebuild: `npm run build`
+
+### Linting Errors
+
+Some ESLint rules are disabled for specific use cases. See `eslint.config.js` for details.
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🤝 Contributing
+
+This is a private project. For internal contributions, please follow the established code standards and submit pull requests for review.
+
+## 📞 Support
+
+For issues or questions, please contact the development team.
+
+---
+
+Built with ❤️ using Angular 21

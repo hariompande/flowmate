@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.task-details-dialog {
+  padding: 1.5rem;
+  min-width: 58rem;
+  max-width: 90vw;
+}
+
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 1rem;
+}
+
+::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #e76345;
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab--active {
+  border-bottom: 3px solid #e76345;
+}
+
+::ng-deep .mat-mdc-tab {
+  background: transparent !important;
+}

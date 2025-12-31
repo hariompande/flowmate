@@ -1,0 +1,203 @@
+<div
+  [attr.data-testid]="'kanban-column-' + column().id"
+  [attr.data-column-id]="column().id"
+  class="flex flex-col bg-neutral-50"
+  [class.border-primary-400]="isDragOver()"
+  [class.border-dashed]="isDragOver()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <!-- Skeleton Loading State -->
+  @if (loading()) {
+    <!-- Column Header Skeleton -->
+    <div
+      [attr.data-testid]="'kanban-column-header-skeleton-' + column().id"
+      class="flex items-center justify-between p-3 border-b border-neutral-200"
+    >
+      <div class="flex items-center gap-2 justify-between w-full py-1">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-neutral-200 animate-pulse"></div>
+          <div class="w-32 h-5 bg-neutral-200 rounded animate-pulse"></div>
+        </div>
+        <div class="w-6 h-6 rounded-full bg-neutral-200 animate-pulse"></div>
+      </div>
+    </div>
+
+    <!-- Tasks Container Skeleton -->
+    <div
+      [attr.data-testid]="'kanban-column-tasks-skeleton-' + column().id"
+      class="flex flex-col gap-2 p-2 overflow-y-auto flex-1"
+    >
+      @for (n of [].constructor(skeletonCardCount()); track n) {
+        <div class="bg-white rounded-lg border border-neutral-100 p-3 w-[18.75rem]">
+          <div class="flex flex-col gap-3">
+            <!-- Title and Menu -->
+            <div class="flex items-center justify-between gap-2">
+              <div class="w-[70%] h-4 bg-neutral-200 rounded animate-pulse"></div>
+              <div class="w-6 h-6 rounded-full bg-neutral-200 animate-pulse"></div>
+            </div>
+            <!-- Description -->
+            <div class="space-y-2">
+              <div class="w-full h-3 bg-neutral-200 rounded animate-pulse"></div>
+              <div class="w-[85%] h-3 bg-neutral-200 rounded animate-pulse"></div>
+            </div>
+            <!-- Tags -->
+            <div class="flex gap-1.5 mt-1">
+              <div class="w-16 h-5 bg-neutral-200 rounded animate-pulse"></div>
+              <div class="w-20 h-5 bg-neutral-200 rounded animate-pulse"></div>
+            </div>
+            <!-- Footer -->
+            <div class="flex items-center justify-between pt-2">
+              <div class="w-12 h-3.5 bg-neutral-200 rounded animate-pulse"></div>
+              <div class="w-6 h-6 rounded-full bg-neutral-200 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Normal Content -->
+  @if (!loading()) {
+    <!-- Column Header (Draggable unless read-only) -->
+    <div
+      [attr.data-testid]="'kanban-column-header-' + column().id"
+      [draggable]="!readOnly()"
+      class="flex items-center justify-between p-3 border-b border-neutral-200"
+      [class.cursor-grab]="!readOnly()"
+      [class.active:cursor-grabbing]="!readOnly()"
+      (dragstart)="!readOnly() && onColumnDragStart($event)"
+      (dragend)="!readOnly() && onColumnDragEnd($event)"
+    >
+      <div class="flex items-center gap-2 justify-between w-full py-1">
+        <div class="flex items-center gap-2">
+          <!-- Assignee Avatar -->
+          @if (column().assignee) {
+            <div
+              class="w-8 h-8 rounded-full flex items-center justify-center text-Label-Small font-semibold flex-shrink-0"
+              [class.bg-transparent]="column().assignee?.avatar || column().assignee?.profilePicUrl"
+              [class.border-2]="!(column().assignee?.avatar || column().assignee?.profilePicUrl)"
+              [class.border-white]="!(column().assignee?.avatar || column().assignee?.profilePicUrl)"
+              [style.backgroundColor]="column().assignee?.color ?? '#000000'"
+              [style.color]="getTextColor(column().assignee?.color ?? '#000000')"
+            >
+              @if (column().assignee?.avatar || column().assignee?.profilePicUrl) {
+                <img
+                  [src]="column().assignee?.avatar || column().assignee?.profilePicUrl"
+                  [alt]="column().assignee?.name ?? ''"
+                  class="w-full h-full rounded-full object-cover"
+                />
+              } @else {
+                <span>{{
+                  column().assignee?.initials ||
+                    (column().assignee?.name ? getInitials(column().assignee?.name ?? '') : '')
+                }}</span>
+              }
+            </div>
+          }
+
+          <!-- Column Title -->
+          <span
+            [attr.data-testid]="'kanban-column-title-' + column().id"
+            class="text-Label-Large text-neutral-800 truncate max-w-[140px]"
+          >
+            {{ (column().assignee?.name ?? '') || column().title }}
+          </span>
+        </div>
+
+        <!-- Task Count -->
+        <span
+          [attr.data-testid]="'kanban-column-count-' + column().id"
+          class="bg-orange-250 flex items-center justify-center text-orange-950 text-Label-X-Small font-semibold rounded-full text-center w-6 h-6"
+        >
+          {{ displayCount() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Tasks Container -->
+    <div
+      [attr.data-testid]="'kanban-column-tasks-' + column().id"
+      class="flex flex-col gap-2 p-2 overflow-y-auto flex-1"
+    >
+      <!-- Drop Indicator at top -->
+      @if (isDragOver() && dragOverIndex() === 0) {
+        <div
+          class="drop-zone flex flex-col items-center justify-center gap-2 py-2 px-4 border-2 border-dashed border-blue-400 rounded-xl bg-blue-50"
+        >
+          <mat-icon class="text-blue-500 text-xl">arrow_forward</mat-icon>
+          <span class="text-blue-500 text-Label-X-Small font-medium">
+            Drop here to move to {{ column().assignee?.name || column().title }}
+          </span>
+        </div>
+      }
+
+      <div class="flex flex-col gap-2">
+        @for (task of column().tasks; track task.id; let index = $index) {
+          <app-kanban-card
+            [card]="task"
+            [showMenu]="showTaskMenu()"
+            [draggable]="!readOnly() && task.draggable !== false"
+            (cardClick)="taskClick.emit($event)"
+            (cardEdit)="taskEdit.emit($event)"
+            (cardDelete)="taskDelete.emit($event)"
+            (assigneeClick)="taskAssigneeClick.emit($event)"
+          />
+
+          <!-- Drop Indicator after each card -->
+          @if (isDragOver() && dragOverIndex() === index + 1) {
+            <div
+              class="drop-zone flex flex-col items-center justify-center gap-2 py-2 px-4 border-2 border-dashed border-blue-800 rounded-xl bg-blue-20"
+            >
+              <mat-icon class="text-blue-800 text-xl">arrow_forward</mat-icon>
+              <span class="text-blue-800 text-Label-X-Small font-medium">
+                Drop here to move to {{ column().assignee?.name || column().title }}
+              </span>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Inline Task Creation (only when not read-only and showAddTask is true) -->
+      @if (!readOnly() && showAddTask()) {
+        @if (isCreatingTask()) {
+          <div [attr.data-testid]="'kanban-column-task-input-container-' + column().id" class="mt-2">
+            <div class="bg-white rounded-xl shadow-sm border border-neutral-200">
+              <textarea
+                #taskInput
+                [attr.data-testid]="'kanban-column-task-input-' + column().id"
+                [(ngModel)]="newTaskTitle"
+                placeholder="What should be done?"
+                rows="3"
+                class="w-full px-4 py-3 text-sm text-neutral-800 placeholder-neutral-400 bg-transparent border-none outline-none resize-none"
+                (keydown)="onInputKeydown($event)"
+                (blur)="onInputBlur($event)"
+              ></textarea>
+            </div>
+            <a
+              [attr.data-testid]="'kanban-column-suggestions-link-' + column().id"
+              href="#"
+              tabindex="0"
+              class="inline-block mt-2 text-sm text-blue-800 font-medium hover:underline hover:text-blue-900"
+              (click)="openSuggestions.emit(column().id); $event.preventDefault()"
+              (mousedown)="$event.preventDefault()"
+            >
+              Suggestions
+            </a>
+          </div>
+        } @else {
+          <!-- Create Task Button -->
+          <button
+            [attr.data-testid]="'kanban-column-add-task-' + column().id"
+            class="w-full py-2 rounded-xl opacity-0 hover:opacity-100 group-hover:opacity-100 bg-white flex items-center justify-center gap-2 text-neutral-600 text-sm font-medium transition-all duration-200 cursor-pointer mt-2"
+            (click)="showTaskInput()"
+          >
+            <mat-icon>add</mat-icon>
+            <span>Create</span>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>
