@@ -1,19 +1,22 @@
-/* Drop zone styling */
-.drop-zone {
-  animation: pulse-border 1.5s ease-in-out infinite;
+/* Smooth transitions for drag operations */
+[data-column-id] {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
-@keyframes pulse-border {
-  0%,
-  100% {
-    border-color: #60a5fa; /* blue-400 */
-  }
-  50% {
-    border-color: #93c5fd; /* blue-300 */
-  }
+/* Drop indicator animation */
+.drop-indicator {
+  animation: fadeIn 0.2s ease-in;
 }
 
-/* Smooth gap transitions */
-.task-item {
-  will-change: transform, opacity;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }

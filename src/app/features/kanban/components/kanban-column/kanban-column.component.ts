@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { KanbanCardComponent } from '../kanban-card/kanban-card.component';
@@ -23,12 +23,9 @@ export class KanbanColumnComponent {
   readonly taskClick = output<string>();
   readonly taskEdit = output<string>();
   readonly taskDelete = output<string>();
-  readonly taskDuplicate = output<string>();
   readonly taskDrop = output<TaskDropPayload>();
   readonly taskReorder = output<TaskReorderPayload>();
-  readonly addTask = output<string>();
   readonly createTask = output<{ columnId: string; title: string }>();
-  readonly openSuggestions = output<string>();
   readonly columnDragStart = output<string>();
   readonly columnDragEnd = output();
   readonly taskAssigneeClick = output<string>();
@@ -37,60 +34,32 @@ export class KanbanColumnComponent {
 
   readonly isDragOver = signal(false);
   readonly dragOverIndex = signal<number | null>(null);
-  readonly isColumnDragging = signal(false);
   readonly isCreatingTask = signal(false);
   readonly newTaskTitle = signal('');
 
-  readonly displayCount = computed(() => {
-    const col = this.column();
-    return col.taskCount ?? col.tasks.length;
-  });
-
-  readonly skeletonCardCount = signal(Math.floor(Math.random() * 4) + 1);
-
-  constructor() {
-    // Reset drag state on destroy
-    effect(() => {
-      return (): void => {
-        this.isDragOver.set(false);
-        this.dragOverIndex.set(null);
-        this.isColumnDragging.set(false);
-      };
-    });
-  }
+  readonly displayCount = computed(() => this.column().taskCount ?? this.column().tasks.length);
 
   onDragOver(event: DragEvent): void {
-    // Ignore drags in read-only mode
-    if (this.readOnly()) return;
-
-    // Ignore column drags - only handle card drags
-    if (event.dataTransfer?.types.includes('application/column-id')) {
-      return;
-    }
+    if (this.readOnly() || event.dataTransfer?.types.includes('application/column-id')) return;
 
     event.preventDefault();
-    const dataTransfer = event.dataTransfer;
-    if (dataTransfer) {
-      dataTransfer.dropEffect = 'move';
-    }
+    event.dataTransfer!.dropEffect = 'move';
     this.isDragOver.set(true);
 
-    // Calculate drop index based on mouse position
-    const columnElement = event.currentTarget as HTMLElement;
-    const container = columnElement.querySelector(`[data-testid="kanban-column-tasks-${this.column().id}"]`);
+    const container = (event.currentTarget as HTMLElement).querySelector(
+      `[data-testid="kanban-column-tasks-${this.column().id}"]`
+    );
     if (!container) return;
 
     const cards = Array.from(container.querySelectorAll('[data-card-id]'));
     const mouseY = event.clientY;
-
     let insertIndex = cards.length;
 
     for (let i = 0; i < cards.length; i++) {
-      const card = cards[i] as HTMLElement;
+      const card = cards[i];
+      if (!(card instanceof HTMLElement)) continue;
       const rect = card.getBoundingClientRect();
-      const cardMiddle = rect.top + rect.height / 2;
-
-      if (mouseY < cardMiddle) {
+      if (mouseY < rect.top + rect.height / 2) {
         insertIndex = i;
         break;
       }
@@ -100,19 +69,16 @@ export class KanbanColumnComponent {
   }
 
   onDragLeave(event: DragEvent): void {
+    const column = event.currentTarget as HTMLElement;
     const relatedTarget = event.relatedTarget as HTMLElement;
-    const columnElement = event.currentTarget as HTMLElement;
-    if (!columnElement.contains(relatedTarget)) {
+    if (!column.contains(relatedTarget)) {
       this.isDragOver.set(false);
       this.dragOverIndex.set(null);
     }
   }
 
   onDrop(event: DragEvent): void {
-    // Ignore column drags
-    if (event.dataTransfer?.types.includes('application/column-id')) {
-      return;
-    }
+    if (event.dataTransfer?.types.includes('application/column-id')) return;
 
     event.preventDefault();
     this.isDragOver.set(false);
@@ -122,11 +88,9 @@ export class KanbanColumnComponent {
 
     const fromColumnId = this.findColumnContainingTask(taskId);
     const toIndex = this.dragOverIndex() ?? this.column().tasks.length;
-
     this.dragOverIndex.set(null);
 
     if (fromColumnId === this.column().id) {
-      // Reordering within the same column
       const fromIndex = this.column().tasks.findIndex((t) => t.id === taskId);
       if (fromIndex !== -1 && fromIndex !== toIndex) {
         this.taskReorder.emit({
@@ -136,7 +100,6 @@ export class KanbanColumnComponent {
         });
       }
     } else if (fromColumnId) {
-      // Moving between columns
       this.taskDrop.emit({
         taskId,
         fromColumnId,
@@ -147,14 +110,11 @@ export class KanbanColumnComponent {
   }
 
   private findColumnContainingTask(taskId: string): string | null {
-    // Check if task is in current column
     if (this.column().tasks.some((t) => t.id === taskId)) {
       return this.column().id;
     }
-    // For cross-column moves, we extract the source from DOM
     const draggedCard = document.querySelector(`[data-card-id="${taskId}"]`);
-    const sourceColumn = draggedCard?.closest('[data-column-id]');
-    return sourceColumn?.getAttribute('data-column-id') ?? null;
+    return draggedCard?.closest('[data-column-id]')?.getAttribute('data-column-id') ?? null;
   }
 
   onColumnDragStart(event: DragEvent): void {
@@ -163,28 +123,18 @@ export class KanbanColumnComponent {
 
     dataTransfer.setData('application/column-id', this.column().id);
     dataTransfer.effectAllowed = 'move';
-    this.isColumnDragging.set(true);
-
-    // Add visual feedback to the column being dragged
-    const target = event.currentTarget as HTMLElement;
-    target.style.opacity = '0.5';
-
+    (event.currentTarget as HTMLElement).style.opacity = '0.5';
     this.columnDragStart.emit(this.column().id);
   }
 
   onColumnDragEnd(event: DragEvent): void {
-    this.isColumnDragging.set(false);
-    const target = event.currentTarget as HTMLElement;
-    target.style.opacity = '1';
-
+    (event.currentTarget as HTMLElement).style.opacity = '1';
     this.columnDragEnd.emit();
   }
 
   showTaskInput(): void {
     this.isCreatingTask.set(true);
-    setTimeout(() => {
-      this.taskInputRef()?.focus();
-    }, 0);
+    setTimeout(() => this.taskInputRef()?.focus(), 0);
   }
 
   hideTaskInput(): void {
@@ -199,14 +149,9 @@ export class KanbanColumnComponent {
       return;
     }
 
-    this.createTask.emit({
-      columnId: this.column().id,
-      title,
-    });
+    this.createTask.emit({ columnId: this.column().id, title });
     this.newTaskTitle.set('');
-    setTimeout(() => {
-      this.taskInputRef()?.focus();
-    }, 0);
+    setTimeout(() => this.taskInputRef()?.focus(), 0);
   }
 
   onInputKeydown(event: KeyboardEvent): void {
@@ -219,16 +164,10 @@ export class KanbanColumnComponent {
   }
 
   onInputBlur(event: FocusEvent): void {
-    // Check if focus is moving to an element within the same container (like the Suggestions link)
     const relatedTarget = event.relatedTarget as HTMLElement | null;
     const container = (event.target as HTMLElement).closest('[data-testid^="kanban-column-task-input-container"]');
+    if (relatedTarget && container?.contains(relatedTarget)) return;
 
-    // If focus is moving within the same container, don't hide
-    if (relatedTarget && container?.contains(relatedTarget)) {
-      return;
-    }
-
-    // Small delay to allow click events to fire before hiding
     setTimeout(() => {
       if (!this.newTaskTitle().trim() && this.isCreatingTask()) {
         this.hideTaskInput();

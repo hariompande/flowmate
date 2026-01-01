@@ -1,1 +1,16 @@
-/* Card styles are handled via Tailwind classes */
+/* Smooth card transitions */
+[data-card-id] {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+[data-card-id]:active {
+  transform: scale(0.98);
+}
+
+/* Menu button visibility */
+.group:hover [data-menu-button] {
+  opacity: 1;
+}

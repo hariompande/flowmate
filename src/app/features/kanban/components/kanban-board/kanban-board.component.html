@@ -1,14 +1,13 @@
 <div
   data-testid="kanban-board"
-  class="flex gap-2 pt-2 flex-1 overflow-x-auto overflow-y-hidden"
+  class="flex gap-4 p-4 flex-1 overflow-x-auto overflow-y-hidden bg-gradient-to-br from-slate-50 to-slate-100"
   (dragover)="onBoardDragOver($event)"
   (dragleave)="onBoardDragLeave($event)"
   (drop)="onBoardDrop($event)"
 >
   @for (column of columns(); track column.id; let index = $index) {
-    <!-- Column Drop Indicator (before column) -->
     @if (canDragColumns() && draggingColumnId() && columnDropIndex() === index && draggingColumnId() !== column.id) {
-      <div class="w-1 bg-blue-300 rounded-full self-stretch flex-shrink-0"></div>
+      <div class="w-1 bg-blue-500 rounded-full self-stretch flex-shrink-0 transition-all duration-200"></div>
     }
 
     <app-kanban-column
@@ -18,23 +17,20 @@
       [showAddTask]="showAddTask()"
       [showTaskMenu]="showTaskMenu()"
       [loading]="false"
-      class="flex-shrink-0 min-w-[17.5rem]"
-      [class.opacity-50]="draggingColumnId() === column.id"
+      class="flex-shrink-0 w-72 transition-opacity duration-200"
+      [class.opacity-40]="draggingColumnId() === column.id"
       (taskClick)="onTaskClick($event)"
       (taskEdit)="onTaskEdit($event)"
       (taskDelete)="onTaskDelete($event)"
       (taskDrop)="onTaskDrop($event)"
       (taskReorder)="onTaskReorder($event)"
-      (addTask)="onAddTask($event)"
       (createTask)="onCreateTask($event)"
-      (openSuggestions)="onOpenSuggestions($event)"
       (columnDragStart)="onColumnDragStart($event)"
       (columnDragEnd)="onColumnDragEnd()"
     />
   }
 
-  <!-- Column Drop Indicator (at end) -->
   @if (canDragColumns() && draggingColumnId() && columnDropIndex() === columns().length) {
-    <div class="w-1 bg-blue-300 rounded-full self-stretch flex-shrink-0"></div>
+    <div class="w-1 bg-blue-500 rounded-full self-stretch flex-shrink-0 transition-all duration-200"></div>
   }
 </div>

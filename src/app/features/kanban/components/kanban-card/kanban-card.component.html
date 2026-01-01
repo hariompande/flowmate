@@ -1,9 +1,9 @@
 <div
-  class="bg-white rounded-lg border border-neutral-100 p-3 cursor-pointer hover:shadow-md hover:border-neutral-300 group transition-[box-shadow,border-color] duration-150 w-75"
+  class="bg-white rounded-lg border border-slate-200 p-4 cursor-pointer hover:shadow-lg hover:border-slate-300 group transition-all duration-200"
   tabindex="0"
   role="button"
-  [attr.data-testid]="cardTestId()"
-  [attr.data-card-id]="cardDataId()"
+  [attr.data-testid]="'kanban-card-' + card().id"
+  [attr.data-card-id]="card().id"
   [draggable]="draggable()"
   (click)="onCardClick()"
   (keydown)="onKeydown($event)"
@@ -11,32 +11,25 @@
   (dragend)="onDragEnd($event)"
 >
   <!-- Title with Menu Button -->
-  <div class="flex items-center justify-between gap-2">
-    <h4 class="text-base text-neutral-strong-950 line-clamp-1 flex-1 font-normal!" [attr.data-testid]="titleTestId()">
+  <div class="flex items-start justify-between gap-2 mb-2">
+    <h4 class="text-sm font-medium text-slate-900 line-clamp-2 flex-1">
       {{ card().title }}
     </h4>
     @if (showMenu()) {
       <button
         type="button"
-        class="opacity-100 transition-opacity p-1 rounded hover:bg-neutral-100 shrink-0"
-        [attr.data-testid]="menuTestId()"
+        class="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 shrink-0"
         [matMenuTriggerFor]="menu"
         (click)="$event.stopPropagation()"
       >
-        <mat-icon class="text-neutral-600 text-xl">more_vert</mat-icon>
+        <mat-icon class="text-slate-500 text-lg">more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
-        @for (item of menuItems(); track 'separator' in item ? 'separator' : item.label) {
+        @for (item of menuItems; track $index) {
           @if ('separator' in item) {
             <mat-divider />
           } @else {
-            <button
-              type="button"
-              mat-menu-item
-              [attr.data-testid]="getMenuItemTestId(item.label)"
-              [class]="item.class || ''"
-              (click)="item.action()"
-            >
+            <button type="button" mat-menu-item [class]="item.class || ''" (click)="item.action()">
               <mat-icon>{{ item.icon }}</mat-icon>
               <span>{{ item.label }}</span>
             </button>
@@ -48,19 +41,16 @@
 
   <!-- Description -->
   @if (card().description) {
-    <p class="text-xs text-neutral-600 mb-3 line-clamp-2 font-normal!" [attr.data-testid]="descriptionTestId()">
+    <p class="text-xs text-slate-600 mb-3 line-clamp-2">
       {{ card().description }}
     </p>
   }
 
   <!-- Tags -->
   @if (hasTags()) {
-    <div class="flex flex-wrap gap-1.5 mt-4">
-      @for (tag of card().tags!; track $index) {
-        <span
-          [attr.data-testid]="getTagTestId($index)"
-          [class]="`text-xs px-2 py-0.5 rounded border ${getTagColorClass(tag.color)}`"
-        >
+    <div class="flex flex-wrap gap-1.5 mb-3">
+      @for (tag of tags(); track $index) {
+        <span [class]="`text-xs px-2 py-0.5 rounded-md border ${getTagColorClass(tag.color)}`">
           {{ tag.label }}
         </span>
       }
@@ -69,11 +59,11 @@
 
   <!-- Custom Fields -->
   @if (hasFields()) {
-    <div class="space-y-2 mb-3">
-      @for (field of card().fields!; track field.key) {
-        <div class="flex items-center gap-2 text-xs text-neutral-600">
+    <div class="space-y-1.5 mb-3">
+      @for (field of fields(); track field.key) {
+        <div class="flex items-center gap-2 text-xs text-slate-600">
           @if (field.icon) {
-            <mat-icon class="text-neutral-400 text-base">{{ field.icon }}</mat-icon>
+            <mat-icon class="text-slate-400 text-sm">{{ field.icon }}</mat-icon>
           }
           @if (field.label) {
             <span class="font-medium">{{ field.label }}:</span>
@@ -85,7 +75,7 @@
   }
 
   <!-- Footer: Ticket ID and Assignee -->
-  @if (showFooter()) {
+  @if (card().ticketId || card().showAssignee) {
     <app-kanban-card-footer [card]="card()" (assigneeClick)="assigneeClick.emit($event)" />
   }
 </div>

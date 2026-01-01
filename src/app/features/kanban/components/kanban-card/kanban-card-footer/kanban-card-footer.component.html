@@ -1,0 +1,15 @@
+<div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-100">
+  <span class="text-xs text-slate-500 font-mono">
+    {{ ticketDisplay() }}
+  </span>
+  @if (showAssignee()) {
+    <button
+      type="button"
+      class="flex items-center p-0.5 rounded-md hover:bg-slate-50 transition-colors"
+      [title]="assigneeTitle()"
+      (click)="onAssigneeClick()"
+    >
+      <app-assignee-avatar [assignee]="assignee()" />
+    </button>
+  }
+</div>
