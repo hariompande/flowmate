@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,7 +23,7 @@ export class AssigneeFilterComponent {
   readonly selectedChange = output<(string | null)[]>();
 
   readonly assignees = computed(() => this.kanbanDataService.getAllAssignees());
-  readonly selectedIds = signal<Set<string | null>>(new Set());
+  readonly selectedIds = signal<Set<string>>(new Set());
   readonly isUnassignedSelected = signal<boolean>(false);
   readonly isLoading = signal<boolean>(false);
   readonly menuOpen = signal<boolean>(false);
@@ -51,15 +51,6 @@ export class AssigneeFilterComponent {
     return this.overflowAssignees().some((a) => this.isSelected(a.id));
   });
 
-  constructor() {
-    effect(() => {
-      this.assignees();
-      this.selectedIds.set(new Set());
-      this.isUnassignedSelected.set(false);
-      this.emitSelection();
-    });
-  }
-
   isSelected(id: string): boolean {
     return this.selectedIds().has(id);
   }
@@ -80,7 +71,7 @@ export class AssigneeFilterComponent {
     this.emitSelection();
   }
 
-  emitSelection(): void {
+  private emitSelection(): void {
     const ids: (string | null)[] = Array.from(this.selectedIds());
     if (this.isUnassignedSelected()) {
       ids.push(null);
